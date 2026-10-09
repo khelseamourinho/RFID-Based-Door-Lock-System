@@ -1,0 +1,145 @@
+<!doctype html>
+<html lang="id">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Riwayat Tap - IoT Access</title>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+  <script src="https://cdn.tailwindcss.com"></script>
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+  <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+  <link rel="stylesheet" href="css/style.css">
+</head>
+<body class="bg-gray-50 text-gray-800">
+
+  <!-- Sidebar Overlay -->
+  <div id="sidebarOverlay" class="fixed inset-0 bg-black/40 z-40 hidden lg:hidden"></div>
+
+  <!-- Sidebar -->
+  <aside id="sidebar" class="sidebar fixed inset-y-0 left-0 w-64 bg-white border-r border-gray-200 z-50 -translate-x-full lg:translate-x-0">
+    <div class="flex items-center justify-between h-16 px-6 border-b border-gray-100">
+      <div class="flex items-center gap-2">
+        <div class="w-8 h-8 bg-blue-600 rounded-lg flex items-center justify-center">
+          <i class="fas fa-id-card text-white text-sm"></i>
+        </div>
+        <span class="font-bold text-gray-800">IoT Access</span>
+      </div>
+      <button id="sidebarClose" class="lg:hidden text-gray-400 hover:text-gray-600"><i class="fas fa-times text-lg"></i></button>
+    </div>
+    <nav class="p-4 space-y-1">
+      <a href="index.html" class="nav-item flex items-center gap-3 px-3 py-2.5 rounded-lg text-sm text-gray-700 hover:bg-gray-100">
+        <i class="fas fa-home w-5 text-center text-gray-400"></i> Dashboard
+      </a>
+      <a href="riwayat-tap.html" class="nav-item flex items-center gap-3 px-3 py-2.5 rounded-lg text-sm text-gray-700 hover:bg-gray-100">
+        <i class="fas fa-history w-5 text-center text-gray-400"></i> Riwayat Tap
+      </a>
+      <a href="riwayat-user.html" class="nav-item flex items-center gap-3 px-3 py-2.5 rounded-lg text-sm text-gray-700 hover:bg-gray-100">
+        <i class="fas fa-exchange-alt w-5 text-center text-gray-400"></i> Keluar Masuk
+      </a>
+      <a href="database-user.html" class="nav-item flex items-center gap-3 px-3 py-2.5 rounded-lg text-sm text-gray-700 hover:bg-gray-100">
+        <i class="fas fa-users w-5 text-center text-gray-400"></i> Database User
+      </a>
+    </nav>
+  </aside>
+
+  <!-- Modal Quick Add User -->
+  <div id="quickAddModal" class="modal-backdrop">
+    <div class="modal-content">
+      <div class="px-6 py-4 border-b border-gray-100 flex justify-between items-center">
+        <h3 class="text-lg font-semibold text-gray-800"><i class="fas fa-user-plus mr-2 text-blue-500"></i>Tambah User Baru</h3>
+        <button onclick="closeQuickAddModal()" class="text-gray-400 hover:text-gray-600"><i class="fas fa-times"></i></button>
+      </div>
+      <div class="p-6">
+        <form id="quickAddForm" onsubmit="event.preventDefault(); submitQuickAddUser();">
+          <div class="space-y-4">
+            <div>
+              <label class="block text-sm font-medium text-gray-700 mb-1">UID Kartu (Otomatis)</label>
+              <input type="text" id="quickUid" class="w-full px-3 py-2 border border-gray-300 rounded-lg bg-gray-100 font-mono text-gray-700" readonly required>
+            </div>
+            <div>
+              <label class="block text-sm font-medium text-gray-700 mb-1">Nama Lengkap</label>
+              <input type="text" id="quickNama" class="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-blue-500 focus:border-blue-500 outline-none" placeholder="Masukkan nama lengkap" required>
+            </div>
+            <div>
+              <label class="block text-sm font-medium text-gray-700 mb-1">NIM</label>
+              <input type="text" id="quickNim" class="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-blue-500 focus:border-blue-500 outline-none" placeholder="Masukkan NIM" required>
+            </div>
+            <div class="grid grid-cols-2 gap-4">
+              <div>
+                <label class="block text-sm font-medium text-gray-700 mb-1">Fakultas</label>
+                <input type="text" id="quickFakultas" class="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-blue-500 focus:border-blue-500 outline-none" placeholder="Fakultas" required>
+              </div>
+              <div>
+                <label class="block text-sm font-medium text-gray-700 mb-1">Prodi</label>
+                <input type="text" id="quickProdi" class="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-blue-500 focus:border-blue-500 outline-none" placeholder="Prodi" required>
+              </div>
+            </div>
+          </div>
+          <div class="flex justify-end gap-3 mt-6">
+            <button type="button" onclick="closeQuickAddModal()" class="px-4 py-2 text-sm text-gray-600 bg-gray-100 hover:bg-gray-200 rounded-lg transition">Batal</button>
+            <button type="submit" id="btnSubmitQuick" class="px-4 py-2 text-sm text-white bg-blue-600 hover:bg-blue-700 rounded-lg transition flex items-center shadow-sm">
+              <i class="fas fa-save mr-2"></i>Simpan User
+            </button>
+          </div>
+        </form>
+      </div>
+    </div>
+  </div>
+
+  <!-- Main Content -->
+  <main class="lg:ml-64 min-h-screen">
+    <header class="sticky top-0 z-30 bg-white/80 backdrop-blur border-b border-gray-200">
+      <div class="flex items-center justify-between h-16 px-6">
+        <div class="flex items-center gap-3">
+          <button id="sidebarToggle" class="lg:hidden text-gray-500 hover:text-gray-700"><i class="fas fa-bars text-lg"></i></button>
+          <h1 class="text-lg font-semibold text-gray-800"><i class="fas fa-history mr-2 text-purple-500"></i>Riwayat Tap</h1>
+        </div>
+        <div class="flex items-center gap-2 text-sm text-gray-500">
+          <span class="w-2 h-2 bg-green-500 rounded-full pulse-dot"></span>
+          <span>Live</span>
+        </div>
+      </div>
+    </header>
+
+    <div class="p-6">
+      <!-- Filter Bar -->
+      <div class="bg-white rounded-xl border border-gray-100 shadow-sm p-4 mb-6 flex flex-wrap items-center gap-3">
+        <div class="flex items-center gap-2">
+          <label class="text-sm font-medium text-gray-600">Filter:</label>
+          <select id="filterStatus" onchange="goToPage(1)" class="text-sm border border-gray-300 rounded-lg px-3 py-1.5 outline-none focus:border-blue-500">
+            <option value="all">Semua</option>
+            <option value="registered">Terdaftar</option>
+            <option value="unregistered">Tidak Dikenal</option>
+          </select>
+        </div>
+        <div class="ml-auto text-sm text-gray-400" id="tapInfo"></div>
+      </div>
+
+      <!-- Table -->
+      <div class="bg-white rounded-xl border border-gray-100 shadow-sm overflow-hidden">
+        <div class="overflow-x-auto">
+          <table class="min-w-full">
+            <thead class="bg-gray-50">
+              <tr>
+                <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">Waktu</th>
+                <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">User</th>
+                <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">Keterangan</th>
+                <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">Status</th>
+                <th class="px-6 py-3 text-center text-xs font-medium text-gray-500 uppercase w-16">Aksi</th>
+              </tr>
+            </thead>
+            <tbody id="tableTap" class="divide-y divide-gray-100">
+              <tr><td colspan="5" class="px-6 py-8 text-center text-sm text-gray-400"><i class="fas fa-spinner fa-spin mr-2"></i>Memuat data...</td></tr>
+            </tbody>
+          </table>
+        </div>
+        <!-- Pagination -->
+        <div class="px-6 py-4 border-t border-gray-100 flex justify-center" id="tapPagination"></div>
+      </div>
+    </div>
+  </main>
+
+  <script src="js/app.js"></script>
+  <script src="js/riwayat-tap.js"></script>
+</body>
+</html>
